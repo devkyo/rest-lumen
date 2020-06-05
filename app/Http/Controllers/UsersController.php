@@ -65,7 +65,7 @@ class UsersController extends Controller
                 return response()->json($user, 200);
 
             } catch(ModelNotFoundException $e){
-                return response()->json(['Error'=>'No content'], 406);
+                return response()->json(['Error'=>'No content'], 201);
             }
         }else {
             return response()->json(['Error'=>'Unauthorized'], 401, []);
@@ -79,7 +79,7 @@ class UsersController extends Controller
                 $user->delete();
                 return response()->json($user, 200);
             }catch(ModelNotFoundException $e) {
-                return response()->json(['Error'=>' Not content'], 406);
+                return response()->json(['Error'=>' Not content'], 201);
             }
         }else {
             return response()->json(['Error'=>'Unauthorized'], 401, []);
@@ -99,6 +99,28 @@ class UsersController extends Controller
         }
     }
 
+    public function getUserByUsernameAndPassword(Request $request){
+
+
+        if ($request->isJson()) {
+            try {
+                $data = $request->json()->all();
+                $user = User::where('username', $data['username'])->first();
+
+
+                if ($user && Hash::check($data['password'], $user->password)) {
+                    return response()->json($user, 200);
+                } else {
+                    return response()->json(['error' => 'No content'], 406);
+                }
+            } catch (ModelNotFoundException $e) {
+                return response()->json(['error' => 'No existe usuario'], 406);
+            }
+        } else {
+            return response()->json(['error' => 'Unauthorized'], 401, []);
+        }
+    
+    }
 
 
 }
